@@ -22,9 +22,10 @@ model User {
 }
 
 model AccessCode {
-  code   Int  @id
-  userId Int  @unique
-  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  code     Int  @id
+  attempts Int  @default(0)
+  userId   Int  @unique
+  user     User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
 }

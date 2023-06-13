@@ -10,20 +10,24 @@ export async function POST(req: Request) {
   const phoneRegex = /^\+1\d{10}$/;
   const isValidPhone = phoneRegex.test(phone);
 
-  let account = await prisma.user.update({
+  let user = await prisma.user.findUniqueOrThrow({
     where: {
       phone,
     },
-    data: {
-      accessCode: {
-        delete: true,
-      },
+    include: {
+      accessCode: true,
     },
   });
 
-  if (isValidPhone && !!account) {
+  if (isValidPhone && !!user) {
     const code = Math.floor(Math.random() * 900000) + 100000;
-    account = await prisma.user.update({
+    if (user?.accessCode?.code) {
+      await prisma.user.update({
+        where: { phone },
+        data: { accessCode: { delete: true } },
+      });
+    }
+    await prisma.user.update({
       where: { phone },
       data: { accessCode: { create: { code } } },
     });
@@ -37,7 +41,7 @@ export async function POST(req: Request) {
   } else {
     if (!isValidPhone)
       return NextResponse.json({ success: false, message: "Invalid phone" });
-    if (!account)
-      return NextResponse.json({ success: false, message: "No account found" });
+    if (!user)
+      return NextResponse.json({ success: false, message: "No user found" });
   }
 }

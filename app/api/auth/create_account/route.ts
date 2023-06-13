@@ -41,7 +41,10 @@ export async function POST(req: Request) {
         from: process.env.TWILIO_PHONE,
         to: phone,
       });
-      return NextResponse.json({ success: true, message: "Message sent" });
+      return NextResponse.json({
+        success: true,
+        message: "Account created and verification code sent",
+      });
     }
   } else {
     return NextResponse.json({ success: false, message: "Invalid phone" });

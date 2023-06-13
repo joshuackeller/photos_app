@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE `AccessCode` ADD COLUMN `attempts` INTEGER NOT NULL DEFAULT 0;
