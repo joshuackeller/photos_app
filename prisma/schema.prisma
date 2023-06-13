@@ -1,0 +1,51 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int         @id @default(autoincrement())
+  name       String
+  phone      String
+  accessCode AccessCode?
+  folders    Folder[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AccessCode {
+  code   Int  @id
+  userId Int  @unique
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+model Folder {
+  id             Int      @id @default(autoincrement())
+  name           String
+  userId         Int
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  parentFolderId Int?
+  parentFolder   Folder?  @relation("ParentFolder", fields: [parentFolderId], references: [id], onDelete: Cascade)
+  childFolders   Folder[] @relation("ParentFolder")
+  images         Image[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Image {
+  id       Int    @id @default(autoincrement())
+  name     String
+  folderId Int
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+}
